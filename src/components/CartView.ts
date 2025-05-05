@@ -46,6 +46,7 @@ export class CartItemView extends Component<ICartItemView> {
 interface ICartView {
     total: string;
     items: HTMLElement[];
+    allowPlaceOrder: boolean;
 }
 
 interface ICartViewActions {
@@ -75,5 +76,9 @@ export class CartView extends Component<ICartView> {
 
     set total(value: string) {
         this.setText(this._cartPrice, value);
+    }
+
+    set allowPlaceOrder(value: boolean) {
+        this._buttonPlaceOrder.disabled = !value;
     }
 }

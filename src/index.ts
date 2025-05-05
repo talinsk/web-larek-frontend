@@ -216,6 +216,7 @@ function renderCart() : HTMLElement {
 
     return cartView.render({
         items: cartProducts,
-        total: getProductPriceText(appData.cart.cost)
+        total: getProductPriceText(appData.cart.cost),
+        allowPlaceOrder: !!appData.cart.cost
     });
 }
