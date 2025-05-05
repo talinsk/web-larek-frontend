@@ -1,7 +1,7 @@
 import './scss/styles.scss';
 import { AppData } from './components/AppData';
 import { EventEmitter } from './components/base/events';
-import { Card, CardPreview, ICard } from './components/Card';
+import { Card, CardPreview } from './components/Card';
 import { CartItemView, CartView } from './components/CartView';
 import { Modal } from './components/common/Modal';
 import { Page } from './components/Page';

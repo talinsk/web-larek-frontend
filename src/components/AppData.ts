@@ -24,14 +24,14 @@ export class AppData {
         return this._cartIsVisible;
     }
 
+    set cartIsVisible(value) {
+        this._cartIsVisible = value;
+    }
+
     get order(): IOrderInfo {
         this._order.total = this.cart.cost;
         this._order.items = this.cart.products.map(p => p.id);
         return {...this._order};
-    }
-
-    set cartIsVisible(value) {
-        this._cartIsVisible = value;
     }
     
     set deliveryInfoComponent(value: DeliveryInfo) {
