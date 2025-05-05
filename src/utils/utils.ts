@@ -133,3 +133,7 @@ export function createElement<
     }
     return element;
 }
+
+export function getProductPriceText(price: number) {
+    return price == null ? 'Бесценно' : `${price} синапсов`;
+}
