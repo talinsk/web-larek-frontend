@@ -11,6 +11,7 @@ import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement, getProductPriceText } from './utils/utils';
 import { DeliveryInfo } from './components/DeliveryInfo';
 import { CustomerInfo } from './components/CustomerInfo';
+import { Success } from './components/Success';
 
 const events = new EventEmitter();
 const api = new WebLarekApi(CDN_URL, API_URL)
@@ -34,6 +35,7 @@ const cartTemplate = ensureElement<HTMLTemplateElement>('#basket');
 const cartItemTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
 // Глобальные контейнеры
 const page = new Page(document.body, { onCartClick: () => events.emit('cart:open') });
@@ -127,7 +129,7 @@ events.on('cart:placeOrder', () => {
     modal.render({
         content: deliveryInfo.render({
             address: '',
-            paymentType: 'online',
+            payment: 'online',
             valid: false,
             errors: []
         })
@@ -162,9 +164,30 @@ events.on(`${contactFormName}:change`, (deliveryInfo: ICustomerInfo) => {
 // Нажимается кнопка "Оплатить" на форме с контактами
 events.on(`${contactFormName}:submit`, () => {    
     appData.customerInfoComponent = null;
-    appData.payOrder();
+    const order = appData.order;
+    api.postOrder(order).then(result => {
+        appData.cart.clear();
+        appData.clearOrder();
+        const success = new Success(cloneTemplate(successTemplate), {
+            onContinueClick: () => {
+                modal.close();
+            }
+        });
+
+        modal.render({
+            content: success.render({
+                description: `Списано ${result.total} синапсов`
+            })
+        });
+    })
+    .catch(err => {
+        console.error(err);
+    })
 });
 
+
+
+// загрузка товаров
 api.getProducts().then(products => {
     events.emit('products:loaded', products);    
 }).catch(err => {

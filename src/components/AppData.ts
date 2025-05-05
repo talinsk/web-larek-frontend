@@ -6,7 +6,7 @@ import { DeliveryInfo } from "./DeliveryInfo";
 export class AppData {
     protected _cart: ICart;
     protected _cartIsVisible: boolean;
-    protected _order: Partial<IOrderInfo> = {};
+    protected _order: IOrderInfo = AppData.getEmptyOrder();
 
     protected _deliveryInfoComponent: DeliveryInfo;
     protected _customerInfoComponent: CustomerInfo;
@@ -22,6 +22,12 @@ export class AppData {
 
     get cartIsVisible(): boolean {
         return this._cartIsVisible;
+    }
+
+    get order(): IOrderInfo {
+        this._order.total = this.cart.cost;
+        this._order.items = this.cart.products.map(p => p.id);
+        return {...this._order};
     }
 
     set cartIsVisible(value) {
@@ -52,7 +58,7 @@ export class AppData {
             errors.push('Необходимо указать адрес доставки');
         }
 
-        if (!this._order.paymentType) {
+        if (!this._order.payment) {
             errors.push('Необходимо указать способ оплаты');
         }
         
@@ -88,8 +94,18 @@ export class AppData {
         };
     }
 
-    payOrder() {
-        this._order.total = this.cart.cost;
-        console.log(this._order);
+    clearOrder() {
+        this._order = AppData.getEmptyOrder();
+    }
+
+    private static getEmptyOrder() : IOrderInfo {
+        return {
+            address: '',
+            phone: '',
+            email: '',
+            total: 0,
+            payment: "online",
+            items: []
+        };
     }
 }

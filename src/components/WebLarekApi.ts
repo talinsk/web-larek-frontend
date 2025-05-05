@@ -1,4 +1,4 @@
-import { IProduct } from "../types";
+import { IOrderInfo, IOrderResult, IProduct } from "../types";
 import { Api, ApiListResponse } from "./base/api";
 
 export interface IWebLarekApi {
@@ -20,5 +20,9 @@ export class WebLarekApi extends Api implements IWebLarekApi{
                 image: this.cdn + item.image
             }))
         );
+    }
+
+    postOrder(order: IOrderInfo): Promise<IOrderResult>{
+        return this.post("/order", order).then((data: IOrderResult) => data);
     }
 }

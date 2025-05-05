@@ -21,7 +21,7 @@ export interface ICart {
 export type TPaymentType = 'online' | 'cash';
 
 export interface IDeliveryInfo {
-    paymentType: TPaymentType;
+    payment: TPaymentType;
     address: string;
 }
 
@@ -32,6 +32,7 @@ export interface ICustomerInfo {
 
 export interface IOrderInfo extends IDeliveryInfo, ICustomerInfo {
     total: number;
+    items: string[];
 }
 
 export interface IOrderResult {

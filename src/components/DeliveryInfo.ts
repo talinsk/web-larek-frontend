@@ -4,7 +4,7 @@ import { IEvents } from "./base/events";
 import { Form } from "./common/Form"
 
 interface IDeliveryComponentInfo {
-    paymentType: TPaymentType,
+    payment: TPaymentType,
     address: string
 }
 
@@ -12,7 +12,7 @@ export class DeliveryInfo extends Form<IDeliveryComponentInfo> {
     protected _address: HTMLInputElement;
     protected _card: HTMLButtonElement;
     protected _cash: HTMLButtonElement;
-    protected _paymentType: TPaymentType;
+    protected _payment: TPaymentType;
 
     static readonly _altActiveClass = "button_alt-active";
 
@@ -26,12 +26,12 @@ export class DeliveryInfo extends Form<IDeliveryComponentInfo> {
         this._address.addEventListener('input', () => this.emitChanges());
         
         this._card.addEventListener('click', () => {
-            this.paymentType = "online";
+            this.payment = "online";
             this.emitChanges();
         })
 
         this._cash.addEventListener('click', () => {
-            this.paymentType = "cash";
+            this.payment = "cash";
             this.emitChanges();
         })
     }
@@ -40,8 +40,8 @@ export class DeliveryInfo extends Form<IDeliveryComponentInfo> {
         this._address.value = value;
     }
 
-    set paymentType(value: TPaymentType) {
-        this._paymentType = value;
+    set payment(value: TPaymentType) {
+        this._payment = value;
         this._card.classList.remove(DeliveryInfo._altActiveClass);
         this._cash.classList.remove(DeliveryInfo._altActiveClass);
 
@@ -56,7 +56,7 @@ export class DeliveryInfo extends Form<IDeliveryComponentInfo> {
     protected emitChanges() {
         this.onFormChange({
             address: this._address.value,
-            paymentType: this._paymentType
+            payment: this._payment
         })
     }
 }
