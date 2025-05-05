@@ -12,7 +12,7 @@ export interface IProduct {
 export interface ICart {
     products: IProduct[];
     count: number;
-    cost: number;
+    cost?: number;
     addProduct(product: IProduct): void;
     removeProduct(product: IProduct): void;
     clear(): void;
@@ -51,7 +51,11 @@ export class Cart implements ICart {
         return this._products.length;
     }
 
-    get cost(): number {        
+    get cost(): number {
+        if (this._products.some(p => p.price === null)) {
+            return null;
+        }
+
         return this._products.reduce(
             (accumulator, currentValue) => accumulator + (currentValue.price || 0),
             0,
@@ -79,7 +83,7 @@ export class Cart implements ICart {
     }
 
     clear(): void {
-        this.products = [];
+        this._products = [];
         this.emitChangeCart();
     }
 
