@@ -1,9 +1,15 @@
-import { ICart } from "../types";
+import { ICart, ICustomerInfo, IDeliveryInfo, IOrderInfo, IValidationResult } from "../types";
 import { IEvents } from "./base/events";
+import { CustomerInfo } from "./CustomerInfo";
+import { DeliveryInfo } from "./DeliveryInfo";
 
 export class AppData {
     protected _cart: ICart;
     protected _cartIsVisible: boolean;
+    protected _order: Partial<IOrderInfo> = {};
+
+    protected _deliveryInfoComponent: DeliveryInfo;
+    protected _customerInfoComponent: CustomerInfo;
 
     constructor(protected events: IEvents, cart: ICart) {
         this._cart = cart;
@@ -22,7 +28,68 @@ export class AppData {
         this._cartIsVisible = value;
     }
     
-    private emitEvent(event: string, payload?: object) {
-        this.events.emit(event, payload ?? {});
+    set deliveryInfoComponent(value: DeliveryInfo) {
+        this._deliveryInfoComponent = value;
+    }
+
+    set customerInfoComponent(value: CustomerInfo) {
+        this._customerInfoComponent = value;
+    }
+
+    setDeliveryInfo(deliveryInfo: IDeliveryInfo) {
+        Object.assign(this._order, deliveryInfo);
+
+        const { valid, errors } = this.validateDeliveryInfo();
+        if (this._deliveryInfoComponent) {
+            this._deliveryInfoComponent.valid = valid;
+            this._deliveryInfoComponent.errors = errors.join("; ");
+        }
+    }
+
+    protected validateDeliveryInfo(): IValidationResult {
+        const errors: string[] = [];
+        if (!this._order.address) {
+            errors.push('Необходимо указать адрес доставки');
+        }
+
+        if (!this._order.paymentType) {
+            errors.push('Необходимо указать способ оплаты');
+        }
+        
+        return {
+            valid: errors.length === 0,
+            errors: errors
+        };
+    }
+
+    setContactInfo(customerInfo: ICustomerInfo) {
+        Object.assign(this._order, customerInfo);
+
+        const { valid, errors } = this.validateCustomerInfo();
+        if (this._customerInfoComponent) {
+            this._customerInfoComponent.valid = valid;
+            this._customerInfoComponent.errors = errors.join("; ");
+        }
+    }
+
+    protected validateCustomerInfo(): IValidationResult {
+        const errors: string[] = [];
+        if (!this._order.email) {
+            errors.push('Необходимо указать адрес электронной почты');
+        }
+
+        if (!this._order.phone) {
+            errors.push('Необходимо указать номер телефона');
+        }
+        
+        return {
+            valid: errors.length === 0,
+            errors: errors
+        };
+    }
+
+    payOrder() {
+        this._order.total = this.cart.cost;
+        console.log(this._order);
     }
 }

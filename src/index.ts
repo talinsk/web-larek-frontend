@@ -6,9 +6,11 @@ import { CartItemView, CartView } from './components/CartView';
 import { Modal } from './components/common/Modal';
 import { Page } from './components/Page';
 import { WebLarekApi } from './components/WebLarekApi';
-import { Cart, IProduct } from './types';
+import { Cart, ICustomerInfo, IDeliveryInfo, IProduct } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement, getProductPriceText } from './utils/utils';
+import { DeliveryInfo } from './components/DeliveryInfo';
+import { CustomerInfo } from './components/CustomerInfo';
 
 const events = new EventEmitter();
 const api = new WebLarekApi(CDN_URL, API_URL)
@@ -21,11 +23,17 @@ events.onAll(({ eventName, data }) => {
     console.log(eventName, data);
 })
 
+// константы имен форм
+const deliveryFormName = "deliveryForm";
+const contactFormName = "contactForm";
+
 // Все шаблоны
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
 const cartTemplate = ensureElement<HTMLTemplateElement>('#basket');
 const cartItemTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
+const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
+const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 
 // Глобальные контейнеры
 const page = new Page(document.body, { onCartClick: () => events.emit('cart:open') });
@@ -114,10 +122,48 @@ events.on('modal:close', () => {
 
 // Нажали на кнопку "Оформить"
 events.on('cart:placeOrder', () => {
-    
+    const deliveryInfo = new DeliveryInfo(cloneTemplate(orderTemplate), events, deliveryFormName);
+    appData.deliveryInfoComponent = deliveryInfo;
+    modal.render({
+        content: deliveryInfo.render({
+            address: '',
+            paymentType: 'online',
+            valid: false,
+            errors: []
+        })
+    });
 });
 
+// Изменяются данные в форме с выбором оплаты и адресом
+events.on(`${deliveryFormName}:change`, (deliveryInfo: IDeliveryInfo) => {
+    appData.setDeliveryInfo(deliveryInfo);
+});
 
+// Нажимается кнопка "Далее" на форме с выбором оплаты и адресом
+events.on(`${deliveryFormName}:submit`, () => {
+    appData.deliveryInfoComponent = null;
+    const customerInfo = new CustomerInfo(cloneTemplate(contactsTemplate), events, contactFormName);
+    appData.customerInfoComponent = customerInfo;
+    modal.render({
+        content: customerInfo.render({
+            email: '',
+            phone: '',
+            valid: false,
+            errors: []
+        })
+    });
+});
+
+// Изменяются данные в форме с контактами
+events.on(`${contactFormName}:change`, (deliveryInfo: ICustomerInfo) => {
+    appData.setContactInfo(deliveryInfo);
+});
+
+// Нажимается кнопка "Оплатить" на форме с контактами
+events.on(`${contactFormName}:submit`, () => {    
+    appData.customerInfoComponent = null;
+    appData.payOrder();
+});
 
 api.getProducts().then(products => {
     events.emit('products:loaded', products);    

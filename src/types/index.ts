@@ -18,19 +18,19 @@ export interface ICart {
     clear(): void;
 }
 
-export type TPaymentType = 'online' | 'deliver';
+export type TPaymentType = 'online' | 'cash';
 
 export interface IDeliveryInfo {
     paymentType: TPaymentType;
     address: string;
 }
 
-export interface ICustomerContact {
+export interface ICustomerInfo {
     email: string;
     phone: string;
 }
 
-export interface IOrderInfo extends IDeliveryInfo, ICustomerContact {
+export interface IOrderInfo extends IDeliveryInfo, ICustomerInfo {
     total: number;
 }
 
@@ -39,6 +39,10 @@ export interface IOrderResult {
     total: number;
 }
 
+export interface IValidationResult {
+    valid: boolean,
+    errors: string[]
+}
 
 // имплементация интерфейсов
 export class Cart implements ICart {
