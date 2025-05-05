@@ -42,34 +42,38 @@ export interface IOrderResult {
 
 // имплементация интерфейсов
 export class Cart implements ICart {
-    products: IProduct[];
+    protected _products: IProduct[] = [];
 
     constructor(protected events: IEvents) {
     }
 
     get count(): number {
-        return this.products.length;
+        return this._products.length;
     }
 
     get cost(): number {        
-        return this.products.reduce(
+        return this._products.reduce(
             (accumulator, currentValue) => accumulator + (currentValue.price || 0),
             0,
         );
     }
 
+    get products(): IProduct[] {
+        return [...this._products];
+    }
+
     addProduct(product: IProduct): void {
-        const index = this.products.findIndex(p => p.id == product.id);
+        const index = this._products.findIndex(p => p.id == product.id);
         if (index < 0) {
-            this.products.push(product);
+            this._products.push(product);
             this.emitChangeCart();
         }
     }
     
     removeProduct(product: IProduct): void {
-        const index = this.products.findIndex(p => p.id == product.id);
+        const index = this._products.findIndex(p => p.id == product.id);
         if (index >= 0) {
-            this.products.splice(index, 1);
+            this._products.splice(index, 1);
             this.emitChangeCart();
         }
     }
