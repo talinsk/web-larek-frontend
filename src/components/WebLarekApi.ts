@@ -17,7 +17,7 @@ export class WebLarekApi extends Api implements IWebLarekApi{
         return this.get("/product/").then((data: ApiListResponse<IProduct>) =>
             data.items.map((item) => ({
                 ...item,
-                image: this.cdn + item.image
+                image: this.cdn + item.image.replace(".svg", ".png")
             }))
         );
     }
