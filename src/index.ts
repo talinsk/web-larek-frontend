@@ -19,11 +19,6 @@ const api = new WebLarekApi(CDN_URL, API_URL)
 // Модель данных приложения
 const appData = new AppData(events, new Cart(events));
 
-// Чтобы мониторить все события, для отладки
-events.onAll(({ eventName, data }) => {
-    console.log(eventName, data);
-})
-
 // константы имен форм
 const deliveryFormName = "deliveryForm";
 const contactFormName = "contactForm";
