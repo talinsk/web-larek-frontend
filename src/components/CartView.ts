@@ -79,6 +79,6 @@ export class CartView extends Component<ICartView> {
     }
 
     set allowPlaceOrder(value: boolean) {
-        this._buttonPlaceOrder.disabled = !value;
+        this.setDisabled(this._buttonPlaceOrder, !value);
     }
 }
