@@ -21,16 +21,16 @@ export class AppData {
         return {...this._deliveryInfo};
     }
 
+    set deliveryInfo(value: IDeliveryInfo) {
+        this._deliveryInfo = {...value};
+    }
+
     get customerInfo(): ICustomerInfo {
         return {...this._customerInfo};
     }
-    
-    setDeliveryInfo(deliveryInfo: IDeliveryInfo) {
-        this._deliveryInfo = {...deliveryInfo};
-    }
 
-    setCustomerInfo(customerInfo: ICustomerInfo) {
-        this._customerInfo = {...customerInfo};
+    set customerInfo(value: ICustomerInfo) {
+        this._customerInfo = {...value};
     }
 
     clearOrderInfo() {

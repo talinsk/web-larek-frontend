@@ -169,7 +169,7 @@ events.on(`${deliveryFormName}:change`, (deliveryInfo: IDeliveryInfo) => {
     deliveryInfoComponent.errors = errors.join("; ");
     
     if (valid) {
-        appData.setDeliveryInfo(deliveryInfo);
+        appData.deliveryInfo = deliveryInfo;
     }
 });
 
@@ -192,7 +192,7 @@ events.on(`${contactFormName}:change`, (customerInfo: ICustomerInfo) => {
     customerInfoComponent.errors = errors.join("; ");
 
     if (valid) {
-        appData.setCustomerInfo(customerInfo);
+        appData.customerInfo = customerInfo;
     }
 });
 
