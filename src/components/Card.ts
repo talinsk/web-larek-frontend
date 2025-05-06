@@ -16,13 +16,13 @@ type TCategoryClasses = {
     [key: string]: string
 };
 
-const defaultCategoryClass = "card__category_soft";
-const categoryClasses : TCategoryClasses = {
-    "софт-скил": "card__category_soft",
-    "другое": "card__category_other",
-    "дополнительное": "card__category_additional",
-    "кнопка": "card__category_button",
-    "хард-скил": "card__category_hard"
+const defaultCategoryClassPostfix = "soft";
+const categoryClassPostfixes : TCategoryClasses = {
+    "софт-скил": "soft",
+    "другое": "other",
+    "дополнительное": "additional",
+    "кнопка": "button",
+    "хард-скил": "hard"
 }
 
 abstract class CardBase<T> extends Component<T> {
@@ -42,7 +42,7 @@ abstract class CardBase<T> extends Component<T> {
 
     set category(value: string) {
         this.setText(this._category, value);
-        this.toggleClass(this._category, categoryClasses[value] || defaultCategoryClass, true);
+        this.toggleClass(this._category, `card__category_${categoryClassPostfixes[value] || defaultCategoryClassPostfix}`, true);
     }
 
     set title(value: string) {
