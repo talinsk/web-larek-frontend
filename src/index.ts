@@ -6,13 +6,14 @@ import { CartItemView, CartView } from './components/CartView';
 import { Modal } from './components/common/Modal';
 import { Page } from './components/Page';
 import { WebLarekApi } from './components/WebLarekApi';
-import { Cart, ICustomerInfo, IDeliveryInfo, IProduct, IVisualState } from './types';
+import { ICustomerInfo, IDeliveryInfo, IProduct, IVisualState } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement, getProductPriceText } from './utils/utils';
 import { DeliveryInfo } from './components/DeliveryInfo';
 import { CustomerInfo } from './components/CustomerInfo';
 import { Success } from './components/Success';
 import { validateCustomerInfo, validateDeliveryInfo } from './utils/vaidationUtils';
+import { Cart } from './components/Cart';
 
 const events = new EventEmitter();
 const api = new WebLarekApi(CDN_URL, API_URL);
@@ -21,7 +22,8 @@ const visualState: IVisualState = {
 }
 
 // Модель данных приложения
-const appData = new AppData(events, new Cart(events));
+const appData = new AppData(events);
+const cart = new Cart(events);
 
 // константы имен форм
 const deliveryFormName = "deliveryForm";
@@ -84,7 +86,7 @@ events.on('products:loaded', () => {
 
 // Кликнули на карточке продукта
 events.on<IProduct>('card:click', (product) => {
-    const inCart = appData.cart.products.some(p => p.id === product.id);
+    const inCart = cart.products.some(p => p.id === product.id);
     const cardPreview = new CardPreview(
         'card', 
         cloneTemplate(cardPreviewTemplate), 
@@ -115,12 +117,12 @@ events.on<IProduct>('card:click', (product) => {
 
 // Кликнули на кнопке "купить" в модальном окне карточки продукта
 events.on<IProduct>('cart:add', (product) => {
-    appData.cart.addProduct(product);
+    cart.addProduct(product);
 });
 
 // Кликнули на кнопке "удалить" в модальном окне карточки продукта
 events.on<IProduct>('cart:remove', (product) => {
-    appData.cart.removeProduct(product);
+    cart.removeProduct(product);
 });
 
 // Кликнули на иконке корзины
@@ -134,7 +136,7 @@ events.on('cart:open', () => {
 
 // Корзина обновилась
 events.on('cart:change', () => {
-    page.counter = appData.cart.count;
+    page.counter = cart.count;
     
     if (visualState.cartModalIsVisible) {
         modal.render({
@@ -196,9 +198,9 @@ events.on(`${contactFormName}:change`, (customerInfo: ICustomerInfo) => {
 
 // Нажимается кнопка "Оплатить" на форме с контактами
 events.on(`${contactFormName}:submit`, () => {    
-    const order = appData.order;
+    const order = appData.getOrder(cart);
     api.postOrder(order).then(result => {
-        appData.cart.clear();
+        cart.clear();
         appData.clearOrder();
 
         modal.render({
@@ -222,7 +224,7 @@ api.getProducts().then(products => {
 });
 
 function renderCart() : HTMLElement {
-    const cartProducts = appData.cart.products.map((p, i) => {
+    const cartProducts = cart.products.map((p, i) => {
         const item = new CartItemView(
             cloneTemplate(cartItemTemplate),
             {
@@ -239,7 +241,7 @@ function renderCart() : HTMLElement {
 
     return cartComponent.render({
         items: cartProducts,
-        total: getProductPriceText(appData.cart.cost),
-        allowPlaceOrder: !!appData.cart.cost
+        total: getProductPriceText(cart.cost),
+        allowPlaceOrder: !!cart.cost
     });
 }
