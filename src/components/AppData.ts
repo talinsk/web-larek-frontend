@@ -2,7 +2,8 @@ import { ICart, ICustomerInfo, IDeliveryInfo, IOrderInfo, IProduct } from "../ty
 import { IEvents } from "./base/events";
 
 export class AppData {
-    protected _order: IOrderInfo = AppData.getEmptyOrder();
+    protected _deliveryInfo: IDeliveryInfo;
+    protected _customerInfo: ICustomerInfo;
     protected _products: IProduct[] = [];
 
     constructor(protected events: IEvents) {        
@@ -16,32 +17,23 @@ export class AppData {
         this._products = value;
     }
 
-    getOrder(cart: ICart): IOrderInfo {
-        this._order.total = cart.cost;
-        this._order.items = cart.products.map(p => p.id);
-        return {...this._order};
+    get deliveryInfo(): IDeliveryInfo {
+        return {...this._deliveryInfo};
+    }
+
+    get customerInfo(): ICustomerInfo {
+        return {...this._customerInfo};
     }
     
     setDeliveryInfo(deliveryInfo: IDeliveryInfo) {
-        Object.assign(this._order, deliveryInfo);
+        this._deliveryInfo = {...deliveryInfo};
     }
 
-    setContactInfo(customerInfo: ICustomerInfo) {
-        Object.assign(this._order, customerInfo);
+    setCustomerInfo(customerInfo: ICustomerInfo) {
+        this._customerInfo = {...customerInfo};
     }
 
-    clearOrder() {
-        this._order = AppData.getEmptyOrder();
-    }
-
-    private static getEmptyOrder() : IOrderInfo {
-        return {
-            address: '',
-            phone: '',
-            email: '',
-            total: 0,
-            payment: "online",
-            items: []
-        };
+    clearOrderInfo() {
+        this._deliveryInfo = this._customerInfo = null;
     }
 }

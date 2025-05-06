@@ -28,9 +28,12 @@ export interface ICustomerInfo {
     phone: string;
 }
 
-export interface IOrderInfo extends IDeliveryInfo, ICustomerInfo {
+export interface IOrderProductsInfo {
     total: number;
     items: string[];
+}
+
+export interface IOrderInfo extends IDeliveryInfo, ICustomerInfo, IOrderProductsInfo {
 }
 
 export interface IOrderResult {

@@ -192,16 +192,21 @@ events.on(`${contactFormName}:change`, (customerInfo: ICustomerInfo) => {
     customerInfoComponent.errors = errors.join("; ");
 
     if (valid) {
-        appData.setContactInfo(customerInfo);
+        appData.setCustomerInfo(customerInfo);
     }
 });
 
 // Нажимается кнопка "Оплатить" на форме с контактами
 events.on(`${contactFormName}:submit`, () => {    
-    const order = appData.getOrder(cart);
+    const order = {
+        ...appData.deliveryInfo,
+        ...appData.customerInfo,
+        total: cart.cost,
+        items: cart.products.map(p => p.id)
+    };
     api.postOrder(order).then(result => {
         cart.clear();
-        appData.clearOrder();
+        appData.clearOrderInfo();
 
         modal.render({
             content: successComponent.render({
