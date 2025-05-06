@@ -12,6 +12,19 @@ export interface ICard {
     price: number;
 }
 
+type TCategoryClasses = {
+    [key: string]: string
+};
+
+const defaultCategoryClass = "card__category_soft";
+const categoryClasses : TCategoryClasses = {
+    "софт-скил": "card__category_soft",
+    "другое": "card__category_other",
+    "дополнительное": "card__category_additional",
+    "кнопка": "card__category_button",
+    "хард-скил": "card__category_hard"
+}
+
 abstract class CardBase<T> extends Component<T> {
     protected _category: HTMLElement;
     protected _title: HTMLElement;
@@ -29,6 +42,7 @@ abstract class CardBase<T> extends Component<T> {
 
     set category(value: string) {
         this.setText(this._category, value);
+        this.toggleClass(this._category, categoryClasses[value] || defaultCategoryClass, true);
     }
 
     set title(value: string) {
