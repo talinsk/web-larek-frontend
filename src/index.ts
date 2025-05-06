@@ -6,7 +6,7 @@ import { CartItemView, CartView } from './components/CartView';
 import { Modal } from './components/common/Modal';
 import { Page } from './components/Page';
 import { WebLarekApi } from './components/WebLarekApi';
-import { Cart, ICustomerInfo, IDeliveryInfo, IProduct } from './types';
+import { Cart, ICustomerInfo, IDeliveryInfo, IProduct, IVisualState } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement, getProductPriceText } from './utils/utils';
 import { DeliveryInfo } from './components/DeliveryInfo';
@@ -15,7 +15,10 @@ import { Success } from './components/Success';
 import { validateCustomerInfo, validateDeliveryInfo } from './utils/vaidationUtils';
 
 const events = new EventEmitter();
-const api = new WebLarekApi(CDN_URL, API_URL)
+const api = new WebLarekApi(CDN_URL, API_URL);
+const visualState: IVisualState = {
+    cartModalIsVisible: false
+}
 
 // Модель данных приложения
 const appData = new AppData(events, new Cart(events));
@@ -122,14 +125,14 @@ events.on('cart:open', () => {
         content: renderCart()
     });
 
-    appData.cartIsVisible = true;
+    visualState.cartModalIsVisible = true;
 });
 
 // Корзина обновилась
 events.on('cart:change', () => {
     page.counter = appData.cart.count;
     
-    if (appData.cartIsVisible) {
+    if (visualState.cartModalIsVisible) {
         modal.render({
             content: renderCart()
         });
@@ -138,7 +141,7 @@ events.on('cart:change', () => {
 
 // Модальное окно закрылось
 events.on('modal:close', () => {
-    appData.cartIsVisible = false;
+    visualState.cartModalIsVisible = false;
 });
 
 // Нажали на кнопку "Оформить"

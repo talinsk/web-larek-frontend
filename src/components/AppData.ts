@@ -5,24 +5,14 @@ import { DeliveryInfo } from "./DeliveryInfo";
 
 export class AppData {
     protected _cart: ICart;
-    protected _cartIsVisible: boolean;
     protected _order: IOrderInfo = AppData.getEmptyOrder();
 
     constructor(protected events: IEvents, cart: ICart) {
         this._cart = cart;
-        this._cartIsVisible = false;
     }
 
     get cart(): ICart {
         return this._cart;
-    }
-
-    get cartIsVisible(): boolean {
-        return this._cartIsVisible;
-    }
-
-    set cartIsVisible(value) {
-        this._cartIsVisible = value;
     }
 
     get order(): IOrderInfo {

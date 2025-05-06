@@ -41,8 +41,12 @@ export interface IOrderResult {
 }
 
 export interface IValidationResult {
-    valid: boolean,
-    errors: string[]
+    valid: boolean;
+    errors: string[];
+}
+
+export interface IVisualState{
+    cartModalIsVisible: boolean;
 }
 
 // имплементация интерфейсов
