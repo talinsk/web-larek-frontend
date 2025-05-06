@@ -56,6 +56,9 @@ const successComponent = new Success(
         }
     }
 );
+const cartComponent = new CartView(cloneTemplate(cartTemplate), {
+    onPlaceOrderClick: () => events.emit('cart:placeOrder', {})
+});
 
 // Продукты загрузились
 events.on<IProduct[]>('products:loaded', (products) => {
@@ -203,7 +206,6 @@ events.on(`${contactFormName}:submit`, () => {
 });
 
 
-
 // загрузка товаров
 api.getProducts().then(products => {
     events.emit('products:loaded', products);    
@@ -227,11 +229,7 @@ function renderCart() : HTMLElement {
         });
     });
 
-    const cartView = new CartView(cloneTemplate(cartTemplate), {
-        onPlaceOrderClick: () => events.emit('cart:placeOrder', {})
-    });
-
-    return cartView.render({
+    return cartComponent.render({
         items: cartProducts,
         total: getProductPriceText(appData.cart.cost),
         allowPlaceOrder: !!appData.cart.cost
