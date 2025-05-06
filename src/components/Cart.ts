@@ -23,7 +23,7 @@ export class Cart implements ICart {
     }
 
     get products(): IProduct[] {
-        return [...this._products];
+        return this._products;
     }
 
     addProduct(product: IProduct): void {
