@@ -61,11 +61,11 @@ events.on<IProduct>('card:click', (product) => {
         {
             onAddButtonClick: () => {
                 modal.close();
-                events.emit('card:add', product)
+                events.emit('cart:add', product)
             },
             onRemoveButtonClick: () => {
                 modal.close();
-                events.emit('card:remove', product)
+                events.emit('cart:remove', product)
             }
         }
     );
@@ -83,12 +83,12 @@ events.on<IProduct>('card:click', (product) => {
 });
 
 // Кликнули на кнопке "купить" в модальном окне карточки продукта
-events.on<IProduct>('card:add', (product) => {
+events.on<IProduct>('cart:add', (product) => {
     appData.cart.addProduct(product);
 });
 
 // Кликнули на кнопке "удалить" в модальном окне карточки продукта
-events.on<IProduct>('card:remove', (product) => {
+events.on<IProduct>('cart:remove', (product) => {
     appData.cart.removeProduct(product);
 });
 
@@ -194,7 +194,7 @@ function renderCart() : HTMLElement {
         const item = new CartItemView(
             cloneTemplate(cartItemTemplate),
             {
-                onRemoveItem: () => events.emit('card:remove', p)
+                onRemoveItem: () => events.emit('cart:remove', p)
             }
         );
 
