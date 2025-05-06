@@ -12,6 +12,7 @@ import { cloneTemplate, ensureElement, getProductPriceText } from './utils/utils
 import { DeliveryInfo } from './components/DeliveryInfo';
 import { CustomerInfo } from './components/CustomerInfo';
 import { Success } from './components/Success';
+import { validateCustomerInfo, validateDeliveryInfo } from './utils/vaidationUtils';
 
 const events = new EventEmitter();
 const api = new WebLarekApi(CDN_URL, API_URL)
@@ -35,6 +36,26 @@ const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 // Глобальные контейнеры
 const page = new Page(document.body, { onCartClick: () => events.emit('cart:open') });
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
+
+// Статические части интерфейса
+const deliveryInfoComponent = new DeliveryInfo(
+    cloneTemplate(orderTemplate), 
+    events, 
+    deliveryFormName
+);
+const customerInfoComponent = new CustomerInfo(
+    cloneTemplate(contactsTemplate), 
+    events, 
+    contactFormName
+);
+const successComponent = new Success(
+    cloneTemplate(successTemplate), 
+    {
+        onContinueClick: () => {
+            modal.close();
+        }
+    }
+);
 
 // Продукты загрузились
 events.on<IProduct[]>('products:loaded', (products) => {
@@ -119,10 +140,8 @@ events.on('modal:close', () => {
 
 // Нажали на кнопку "Оформить"
 events.on('cart:placeOrder', () => {
-    const deliveryInfo = new DeliveryInfo(cloneTemplate(orderTemplate), events, deliveryFormName);
-    appData.deliveryInfoComponent = deliveryInfo;
     modal.render({
-        content: deliveryInfo.render({
+        content: deliveryInfoComponent.render({
             address: '',
             payment: 'online',
             valid: false,
@@ -133,16 +152,19 @@ events.on('cart:placeOrder', () => {
 
 // Изменяются данные в форме с выбором оплаты и адресом
 events.on(`${deliveryFormName}:change`, (deliveryInfo: IDeliveryInfo) => {
-    appData.setDeliveryInfo(deliveryInfo);
+    const { valid, errors } = validateDeliveryInfo(deliveryInfo);
+    deliveryInfoComponent.valid = valid;
+    deliveryInfoComponent.errors = errors.join("; ");
+    
+    if (valid) {
+        appData.setDeliveryInfo(deliveryInfo);
+    }
 });
 
 // Нажимается кнопка "Далее" на форме с выбором оплаты и адресом
 events.on(`${deliveryFormName}:submit`, () => {
-    appData.deliveryInfoComponent = null;
-    const customerInfo = new CustomerInfo(cloneTemplate(contactsTemplate), events, contactFormName);
-    appData.customerInfoComponent = customerInfo;
     modal.render({
-        content: customerInfo.render({
+        content: customerInfoComponent.render({
             email: '',
             phone: '',
             valid: false,
@@ -152,25 +174,25 @@ events.on(`${deliveryFormName}:submit`, () => {
 });
 
 // Изменяются данные в форме с контактами
-events.on(`${contactFormName}:change`, (deliveryInfo: ICustomerInfo) => {
-    appData.setContactInfo(deliveryInfo);
+events.on(`${contactFormName}:change`, (customerInfo: ICustomerInfo) => {
+    const { valid, errors } = validateCustomerInfo(customerInfo);
+    customerInfoComponent.valid = valid;
+    customerInfoComponent.errors = errors.join("; ");
+
+    if (valid) {
+        appData.setContactInfo(customerInfo);
+    }
 });
 
 // Нажимается кнопка "Оплатить" на форме с контактами
 events.on(`${contactFormName}:submit`, () => {    
-    appData.customerInfoComponent = null;
     const order = appData.order;
     api.postOrder(order).then(result => {
         appData.cart.clear();
         appData.clearOrder();
-        const success = new Success(cloneTemplate(successTemplate), {
-            onContinueClick: () => {
-                modal.close();
-            }
-        });
 
         modal.render({
-            content: success.render({
+            content: successComponent.render({
                 description: `Списано ${result.total} синапсов`
             })
         });
