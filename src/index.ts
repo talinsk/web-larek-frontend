@@ -93,7 +93,7 @@ events.on<IProduct>('cart:remove', (product) => {
 });
 
 // Кликнули на иконке корзины
-events.on<IProduct>('cart:open', () => {
+events.on('cart:open', () => {
     modal.render({
         content: renderCart()
     });
@@ -102,7 +102,7 @@ events.on<IProduct>('cart:open', () => {
 });
 
 // Корзина обновилась
-events.on<IProduct>('cart:change', () => {
+events.on('cart:change', () => {
     page.counter = appData.cart.count;
     
     if (appData.cartIsVisible) {
