@@ -1,14 +1,21 @@
-import { ICart, ICustomerInfo, IDeliveryInfo, IOrderInfo, IValidationResult } from "../types";
+import { ICart, ICustomerInfo, IDeliveryInfo, IOrderInfo, IProduct, IValidationResult } from "../types";
 import { IEvents } from "./base/events";
-import { CustomerInfo } from "./CustomerInfo";
-import { DeliveryInfo } from "./DeliveryInfo";
 
 export class AppData {
     protected _cart: ICart;
     protected _order: IOrderInfo = AppData.getEmptyOrder();
+    protected _products: IProduct[] = [];
 
     constructor(protected events: IEvents, cart: ICart) {
         this._cart = cart;
+    }
+
+    get products(): IProduct[] {
+        return this._products;
+    }
+
+    set products(value: IProduct[]) {
+        this._products = value;
     }
 
     get cart(): ICart {

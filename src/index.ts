@@ -64,8 +64,12 @@ const cartComponent = new CartView(cloneTemplate(cartTemplate), {
 });
 
 // Продукты загрузились
-events.on<IProduct[]>('products:loaded', (products) => {
-    page.catalog = products.map(item => {
+events.on('products:loaded', () => {
+    if (!appData.products) {
+        return;
+    }
+    
+    page.catalog = appData.products.map(item => {
         const card = new Card('card', cloneTemplate(cardCatalogTemplate), {
             onClick: () => events.emit('card:click', item)
         });
@@ -211,7 +215,8 @@ events.on(`${contactFormName}:submit`, () => {
 
 // загрузка товаров
 api.getProducts().then(products => {
-    events.emit('products:loaded', products);    
+    appData.products = products;
+    events.emit('products:loaded');
 }).catch(err => {
     console.error(err);
 });
