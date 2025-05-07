@@ -1,4 +1,4 @@
-import { ICart, ICustomerInfo, IDeliveryInfo, IOrderInfo, IProduct } from "../types";
+import { ICart, ICustomerInfo, IDeliveryInfo, IOrderInfo, IProduct, IValidationResult } from "../types";
 import { IEvents } from "./base/events";
 
 export class AppData {
@@ -35,5 +35,37 @@ export class AppData {
 
     clearOrderInfo() {
         this._deliveryInfo = this._customerInfo = null;
+    }
+
+    validateDeliveryInfo(deliveryInfo: IDeliveryInfo): IValidationResult {
+        const errors: string[] = [];
+        if (!deliveryInfo.address) {
+            errors.push('Необходимо указать адрес доставки');
+        }
+    
+        if (!deliveryInfo.payment) {
+            errors.push('Необходимо указать способ оплаты');
+        }
+        
+        return {
+            valid: errors.length === 0,
+            errors: errors
+        };
+    }
+    
+    validateCustomerInfo(customerInfo: ICustomerInfo): IValidationResult {
+        const errors: string[] = [];
+        if (!customerInfo.email) {
+            errors.push('Необходимо указать адрес электронной почты');
+        }
+    
+        if (!customerInfo.phone) {
+            errors.push('Необходимо указать номер телефона');
+        }
+        
+        return {
+            valid: errors.length === 0,
+            errors: errors
+        };
     }
 }

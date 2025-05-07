@@ -12,7 +12,6 @@ import { cloneTemplate, ensureElement, getProductPriceText } from './utils/utils
 import { DeliveryInfo } from './components/DeliveryInfo';
 import { CustomerInfo } from './components/CustomerInfo';
 import { Success } from './components/Success';
-import { validateCustomerInfo, validateDeliveryInfo } from './utils/vaidationUtils';
 import { Cart } from './components/Cart';
 
 const events = new EventEmitter();
@@ -164,7 +163,7 @@ events.on('cart:placeOrder', () => {
 
 // Изменяются данные в форме с выбором оплаты и адресом
 events.on(`${deliveryFormName}:change`, (deliveryInfo: IDeliveryInfo) => {
-    const { valid, errors } = validateDeliveryInfo(deliveryInfo);
+    const { valid, errors } = appData.validateDeliveryInfo(deliveryInfo);
     deliveryInfoComponent.valid = valid;
     deliveryInfoComponent.errors = errors.join("; ");
     
@@ -187,7 +186,7 @@ events.on(`${deliveryFormName}:submit`, () => {
 
 // Изменяются данные в форме с контактами
 events.on(`${contactFormName}:change`, (customerInfo: ICustomerInfo) => {
-    const { valid, errors } = validateCustomerInfo(customerInfo);
+    const { valid, errors } = appData.validateCustomerInfo(customerInfo);
     customerInfoComponent.valid = valid;
     customerInfoComponent.errors = errors.join("; ");
 
