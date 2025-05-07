@@ -222,7 +222,6 @@ events.on(`${contactFormName}:submit`, () => {
 // загрузка товаров
 api.getProducts().then(products => {
     appData.products = products;
-    events.emit('products:loaded');
 }).catch(err => {
     console.error(err);
 });

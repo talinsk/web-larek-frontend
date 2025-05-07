@@ -15,6 +15,7 @@ export class AppData {
 
     set products(value: IProduct[]) {
         this._products = value;
+        this.events.emit('products:loaded');
     }
 
     get deliveryInfo(): IDeliveryInfo {
