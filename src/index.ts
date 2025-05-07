@@ -1,5 +1,5 @@
 import './scss/styles.scss';
-import { AppData } from './components/AppData';
+import { OrderModel } from './components/models/OrderModel';
 import { EventEmitter } from './components/base/events';
 import { Card, CardPreview } from './components/Card';
 import { CartItemView, CartView } from './components/CartView';
@@ -12,7 +12,8 @@ import { cloneTemplate, ensureElement, getProductPriceText } from './utils/utils
 import { DeliveryInfo } from './components/DeliveryInfo';
 import { CustomerInfo } from './components/CustomerInfo';
 import { Success } from './components/Success';
-import { Cart } from './components/Cart';
+import { CartModel } from './components/models/CartModel';
+import { ProductsModel } from './components/models/ProductsModel';
 
 const events = new EventEmitter();
 const api = new WebLarekApi(CDN_URL, API_URL);
@@ -21,8 +22,9 @@ const visualState: IVisualState = {
 }
 
 // Модель данных приложения
-const appData = new AppData(events);
-const cart = new Cart(events);
+const orderData = new OrderModel();
+const cartData = new CartModel(events);
+const productsData = new ProductsModel(events);
 
 // константы имен форм
 const deliveryFormName = "deliveryForm";
@@ -66,11 +68,11 @@ const cartComponent = new CartView(cloneTemplate(cartTemplate), {
 
 // Продукты загрузились
 events.on('products:loaded', () => {
-    if (!appData.products) {
+    if (!productsData.products) {
         return;
     }
     
-    page.catalog = appData.products.map(item => {
+    page.catalog = productsData.products.map(item => {
         const card = new Card('card', cloneTemplate(cardCatalogTemplate), {
             onClick: () => events.emit('card:click', item)
         });
@@ -85,7 +87,7 @@ events.on('products:loaded', () => {
 
 // Кликнули на карточке продукта
 events.on<IProduct>('card:click', (product) => {
-    const inCart = cart.products.some(p => p.id === product.id);
+    const inCart = cartData.products.some(p => p.id === product.id);
     const cardPreview = new CardPreview(
         'card', 
         cloneTemplate(cardPreviewTemplate), 
@@ -116,12 +118,12 @@ events.on<IProduct>('card:click', (product) => {
 
 // Кликнули на кнопке "купить" в модальном окне карточки продукта
 events.on<IProduct>('cart:add', (product) => {
-    cart.addProduct(product);
+    cartData.addProduct(product);
 });
 
 // Кликнули на кнопке "удалить" в модальном окне карточки продукта
 events.on<IProduct>('cart:remove', (product) => {
-    cart.removeProduct(product);
+    cartData.removeProduct(product);
 });
 
 // Кликнули на иконке корзины
@@ -135,7 +137,7 @@ events.on('cart:open', () => {
 
 // Корзина обновилась
 events.on('cart:change', () => {
-    page.counter = cart.count;
+    page.counter = cartData.count;
     
     if (visualState.cartModalIsVisible) {
         modal.render({
@@ -163,12 +165,12 @@ events.on('cart:placeOrder', () => {
 
 // Изменяются данные в форме с выбором оплаты и адресом
 events.on(`${deliveryFormName}:change`, (deliveryInfo: IDeliveryInfo) => {
-    const { valid, errors } = appData.validateDeliveryInfo(deliveryInfo);
+    const { valid, errors } = orderData.validateDeliveryInfo(deliveryInfo);
     deliveryInfoComponent.valid = valid;
     deliveryInfoComponent.errors = errors.join("; ");
     
     if (valid) {
-        appData.deliveryInfo = deliveryInfo;
+        orderData.deliveryInfo = deliveryInfo;
     }
 });
 
@@ -186,26 +188,26 @@ events.on(`${deliveryFormName}:submit`, () => {
 
 // Изменяются данные в форме с контактами
 events.on(`${contactFormName}:change`, (customerInfo: ICustomerInfo) => {
-    const { valid, errors } = appData.validateCustomerInfo(customerInfo);
+    const { valid, errors } = orderData.validateCustomerInfo(customerInfo);
     customerInfoComponent.valid = valid;
     customerInfoComponent.errors = errors.join("; ");
 
     if (valid) {
-        appData.customerInfo = customerInfo;
+        orderData.customerInfo = customerInfo;
     }
 });
 
 // Нажимается кнопка "Оплатить" на форме с контактами
 events.on(`${contactFormName}:submit`, () => {    
-    const order = {
-        ...appData.deliveryInfo,
-        ...appData.customerInfo,
-        total: cart.cost,
-        items: cart.products.map(p => p.id)
+    const orderRequest = {
+        ...orderData.deliveryInfo,
+        ...orderData.customerInfo,
+        total: cartData.cost,
+        items: cartData.products.map(p => p.id)
     };
-    api.postOrder(order).then(result => {
-        cart.clear();
-        appData.clearOrderInfo();
+    api.postOrder(orderRequest).then(result => {
+        cartData.clear();
+        orderData.clearOrderInfo();
 
         modal.render({
             content: successComponent.render({
@@ -221,13 +223,13 @@ events.on(`${contactFormName}:submit`, () => {
 
 // загрузка товаров
 api.getProducts().then(products => {
-    appData.products = products;
+    productsData.products = products;
 }).catch(err => {
     console.error(err);
 });
 
 function renderCart() : HTMLElement {
-    const cartProducts = cart.products.map((p, i) => {
+    const cartProducts = cartData.products.map((p, i) => {
         const item = new CartItemView(
             cloneTemplate(cartItemTemplate),
             {
@@ -244,7 +246,7 @@ function renderCart() : HTMLElement {
 
     return cartComponent.render({
         items: cartProducts,
-        total: getProductPriceText(cart.cost),
-        allowPlaceOrder: !!cart.cost
+        total: getProductPriceText(cartData.cost),
+        allowPlaceOrder: !!cartData.cost
     });
 }

@@ -1,21 +1,10 @@
-import { ICart, ICustomerInfo, IDeliveryInfo, IOrderInfo, IProduct, IValidationResult } from "../types";
-import { IEvents } from "./base/events";
+import { ICustomerInfo, IDeliveryInfo, IValidationResult } from "../../types";
 
-export class AppData {
+export class OrderModel {
     protected _deliveryInfo: IDeliveryInfo;
     protected _customerInfo: ICustomerInfo;
-    protected _products: IProduct[] = [];
 
-    constructor(protected events: IEvents) {        
-    }
-
-    get products(): IProduct[] {
-        return this._products;
-    }
-
-    set products(value: IProduct[]) {
-        this._products = value;
-        this.events.emit('products:loaded');
+    constructor() {
     }
 
     get deliveryInfo(): IDeliveryInfo {
