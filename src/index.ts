@@ -71,7 +71,7 @@ events.on('products:loaded', () => {
     if (!productsData.products) {
         return;
     }
-    
+
     page.catalog = productsData.products.map(item => {
         const card = new Card('card', cloneTemplate(cardCatalogTemplate), {
             onClick: () => events.emit('card:click', item)
