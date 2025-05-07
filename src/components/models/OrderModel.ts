@@ -4,9 +4,6 @@ export class OrderModel {
     protected _deliveryInfo: IDeliveryInfo;
     protected _customerInfo: ICustomerInfo;
 
-    constructor() {
-    }
-
     get deliveryInfo(): IDeliveryInfo {
         return {...this._deliveryInfo};
     }

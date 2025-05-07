@@ -1,4 +1,4 @@
-import { ICustomerInfo, IDeliveryInfo, IOrderInfo, IProduct, IValidationResult } from "../../types";
+import { IProduct } from "../../types";
 import { IEvents } from "../base/events";
 
 export class ProductsModel {
